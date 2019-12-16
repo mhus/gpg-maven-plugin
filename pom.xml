@@ -31,7 +31,7 @@ under the License.
 
   <artifactId>gpg-maven-plugin</artifactId>
   <groupId>de.mhus.mvn.plugin</groupId>
-  <version>1.7-SNAPSHOT</version>
+  <version>1.7</version>
   <packaging>maven-plugin</packaging>
 
   <name>Modified Maven GPG Plugin</name>
@@ -51,6 +51,10 @@ under the License.
   <properties>
     <mavenVersion>2.2.1</mavenVersion>
     <javaVersion>7</javaVersion>
+    
+    <nexus.plugin>1.6.8</nexus.plugin>
+    <source.plugin>2.2.1</source.plugin>
+    <gpg.plugin>1.6</gpg.plugin>
   </properties>
 
   <dependencies>
@@ -118,7 +122,62 @@ under the License.
         </plugin>
       </plugins>
     </pluginManagement>
+    
+    <plugins>
+	    <plugin>
+	        <groupId>org.sonatype.plugins</groupId>
+	        <artifactId>nexus-staging-maven-plugin</artifactId>
+	        <version>${nexus.plugin}</version>
+	        <extensions>true</extensions>
+	        <configuration>
+	            <serverId>ossrh</serverId>
+	            <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+	            <autoReleaseAfterClose>true</autoReleaseAfterClose>
+	        </configuration>
+	    </plugin>
+	    <plugin>
+	        <groupId>org.apache.maven.plugins</groupId>
+	        <artifactId>maven-gpg-plugin</artifactId>
+	        <version>${gpg.plugin}</version>
+	        <configuration>
+	            <passphrase>${gpg.passphrase}</passphrase>
+	        </configuration>
+	        <executions>
+	            <execution>
+	                <id>sign-artifacts</id>
+	                <phase>verify</phase>
+	                <goals>
+	                    <goal>sign</goal>
+	                </goals>
+	            </execution>
+	        </executions>
+	    </plugin>
+	    <plugin>
+	        <groupId>org.apache.maven.plugins</groupId>
+	        <artifactId>maven-source-plugin</artifactId>
+	        <version>${source.plugin}</version>
+	        <executions>
+	            <execution>
+	                <id>attach-sources</id>
+	                <goals>
+	                    <goal>jar-no-fork</goal>
+	                </goals>
+	            </execution>
+	        </executions>
+	    </plugin>
+    </plugins>
   </build>
+
+  <distributionManagement>
+      <snapshotRepository>
+          <id>ossrh</id>
+          <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+      </snapshotRepository>
+      <repository>
+          <id>ossrh</id>
+          <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+      </repository>
+  </distributionManagement>
 
   <profiles>
     <profile>

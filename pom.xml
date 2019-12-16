@@ -31,7 +31,7 @@ under the License.
 
   <artifactId>gpg-maven-plugin</artifactId>
   <groupId>de.mhus.mvn.plugin</groupId>
-  <version>1.7</version>
+  <version>1.8-SNAPSHOT</version>
   <packaging>maven-plugin</packaging>
 
   <name>Modified Maven GPG Plugin</name>

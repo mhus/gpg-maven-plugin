@@ -26,7 +26,7 @@ import java.util.List;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.handler.ArtifactHandler;
-import org.apache.maven.artifact.metadata.ArtifactMetadata; // org.apache.maven.repository.legacy.metadata.ArtifactMetadata
+import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.versioning.ArtifactVersion;
@@ -37,7 +37,6 @@ import org.apache.maven.artifact.versioning.VersionRange;
  * A wrapper class for attached artifacts which have a GPG signature. Needed as attached artifacts in general do not
  * have metadata.
  */
-@SuppressWarnings("deprecation")
 public class AttachedSignedArtifact
     implements Artifact
 {

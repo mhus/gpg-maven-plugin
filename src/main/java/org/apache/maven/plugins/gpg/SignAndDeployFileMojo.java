@@ -30,7 +30,7 @@ import java.util.List;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
-import org.apache.maven.artifact.metadata.ArtifactMetadata; // org.apache.maven.repository.legacy.metadata.ArtifactMetadata
+import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 import org.apache.maven.artifact.repository.MavenArtifactRepository;
@@ -70,7 +70,6 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
  * @author Daniel Kulp
  * @since 1.0-beta-4
  */
-@SuppressWarnings("deprecation")
 @Mojo( name = "sign-and-deploy-file", requiresProject = false, threadSafe = true )
 public class SignAndDeployFileMojo
     extends AbstractGpgMojo
@@ -693,7 +692,6 @@ public class SignAndDeployFileMojo
             this.result = result;
         }
 
-        @Override
         public void add( Severity severity, String message, InputLocation location, Exception cause )
         {
             if ( !ModelProblem.Severity.WARNING.equals( severity ) )

@@ -33,8 +33,9 @@ import org.codehaus.plexus.util.FileUtils;
  * @author dkulp
  *
  */
+@SuppressWarnings("deprecation")
 public class AscArtifactMetadata
-    extends AbstractArtifactMetadata implements org.apache.maven.shared.transfer.metadata.ArtifactMetadata  
+    extends AbstractArtifactMetadata implements org.apache.maven.shared.transfer.metadata.ArtifactMetadata   // org.apache.maven.repository.legacy.metadata.ArtifactMetadata
 {
 
     private final File file;

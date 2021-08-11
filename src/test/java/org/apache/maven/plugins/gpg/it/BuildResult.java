@@ -1,4 +1,4 @@
-package org.apache.maven.plugin.gpg;
+package org.apache.maven.plugins.gpg.it;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -21,43 +21,28 @@ package org.apache.maven.plugin.gpg;
 
 import java.io.File;
 
-/** @author Jason van Zyl */
-public class SigningBundle
+import org.apache.maven.shared.invoker.InvocationResult;
+
+public class BuildResult
 {
 
-    private String extension;
+    private final File buildLog;
+    private final InvocationResult invocationResult;
 
-    private String classifier;
-
-    private File signature;
-
-    public SigningBundle( String extension, File signature )
+    public BuildResult( final File buildLog, final InvocationResult invocationResult )
     {
-        this.extension = extension;
-
-        this.signature = signature;
+        this.buildLog = buildLog;
+        this.invocationResult = invocationResult;
     }
 
-    public SigningBundle( String extension, String classifier, File signature )
+    public File getBuildLog()
     {
-        this.extension = extension;
-        this.classifier = classifier;
-        this.signature = signature;
+        return buildLog;
     }
 
-    public String getExtension()
+    public InvocationResult getInvocationResult()
     {
-        return extension;
-    }
-
-    public File getSignature()
-    {
-        return signature;
-    }
-
-    public String getClassifier()
-    {
-        return classifier;
+        return invocationResult;
     }
 
 }

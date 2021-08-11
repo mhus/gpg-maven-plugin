@@ -1,4 +1,4 @@
-package org.apache.maven.plugin.gpg;
+package org.apache.maven.plugins.gpg;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -21,6 +21,7 @@ package org.apache.maven.plugin.gpg;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -48,7 +49,8 @@ public class GpgSignAttachedMojo
     extends AbstractGpgMojo
 {
 
-    private static final String DEFAULT_EXCLUDES[] = new String[] { "**/*.md5", "**/*.sha1", "**/*.asc" };
+    private static final String DEFAULT_EXCLUDES[] =
+        new String[] { "**/*.md5", "**/*.sha1", "**/*.sha256", "**/*.sha512", "**/*.asc" };
 
     /**
      * Skip doing the gpg signing.
@@ -58,7 +60,7 @@ public class GpgSignAttachedMojo
 
     /**
      * A list of files to exclude from being signed. Can contain Ant-style wildcards and double wildcards. The default
-     * excludes are <code>**&#47;*.md5   **&#47;*.sha1    **&#47;*.asc</code>.
+     * excludes are <code>**&#47;*.md5   **&#47;*.sha1    **&#47;*.sha256    **&#47;*.sha512    **&#47;*.asc</code>.
      *
      * @since 1.0-alpha-4
      */
@@ -143,7 +145,6 @@ public class GpgSignAttachedMojo
                 if ( projectArtifactSignature != null )
                 {
                     signingBundles.add( new SigningBundle( artifact.getArtifactHandler().getExtension(),
-                                                           artifact.getClassifier(),
                                                            projectArtifactSignature ) );
                 }
             }
@@ -192,6 +193,12 @@ public class GpgSignAttachedMojo
 
             File file = artifact.getFile();
 
+            if ( isExcluded( artifact ) )
+            {
+                getLog().debug( "Skipping generation of signature for excluded " + file );
+                continue;
+            }
+
             getLog().debug( "Generating signature for " + file );
 
             File signature = signer.generateSignatureForArtifact( file );
@@ -217,19 +224,24 @@ public class GpgSignAttachedMojo
     /**
      * Tests whether or not a name matches against at least one exclude pattern.
      *
-     * @param name The name to match. Must not be <code>null</code>.
+     * @param artifact The artifact to match. Must not be <code>null</code>.
      * @return <code>true</code> when the name matches against at least one exclude pattern, or <code>false</code>
      *         otherwise.
      */
-    protected boolean isExcluded( String name )
+    protected boolean isExcluded( Artifact artifact )
     {
+        final Path projectBasePath = project.getBasedir().toPath();
+        final Path artifactPath = artifact.getFile().toPath();
+        final String relativeArtifactPath = projectBasePath.relativize( artifactPath ).toString();
+
         for ( String exclude : excludes )
         {
-            if ( SelectorUtils.matchPath( exclude, name ) )
+            if ( SelectorUtils.matchPath( exclude, relativeArtifactPath ) )
             {
                 return true;
             }
         }
+
         return false;
     }
 

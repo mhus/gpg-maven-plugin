@@ -25,13 +25,13 @@ under the License.
   <parent>
     <artifactId>maven-plugins</artifactId>
     <groupId>org.apache.maven.plugins</groupId>
-    <version>33</version>
-    <relativePath/>
+    <version>34</version>
+    <relativePath />
   </parent>
 
   <artifactId>gpg-maven-plugin</artifactId>
   <groupId>de.mhus.mvn.plugin</groupId>
-  <version>1.8-SNAPSHOT</version>
+  <version>3.0.2-SNAPSHOT</version>
   <packaging>maven-plugin</packaging>
 
   <name>Modified Maven GPG Plugin</name>
@@ -49,12 +49,10 @@ under the License.
   </scm>
 
   <properties>
-    <mavenVersion>2.2.1</mavenVersion>
+    <mavenVersion>3.0</mavenVersion>
     <javaVersion>7</javaVersion>
-    
-    <nexus.plugin>1.6.8</nexus.plugin>
-    <source.plugin>2.2.1</source.plugin>
-    <gpg.plugin>1.6</gpg.plugin>
+    <project.build.outputTimestamp>2021-05-05T16:39:01Z</project.build.outputTimestamp>
+    <resource.delimiter>@</resource.delimiter>
   </properties>
 
   <dependencies>
@@ -65,7 +63,7 @@ under the License.
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
-      <artifactId>maven-project</artifactId>
+      <artifactId>maven-core</artifactId>
       <version>${mavenVersion}</version>
     </dependency>
     <dependency>
@@ -75,12 +73,17 @@ under the License.
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
-      <artifactId>maven-repository-metadata</artifactId>
+      <artifactId>maven-model</artifactId>
       <version>${mavenVersion}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
-      <artifactId>maven-model</artifactId>
+      <artifactId>maven-model-builder</artifactId>
+      <version>${mavenVersion}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-settings</artifactId>
       <version>${mavenVersion}</version>
     </dependency>
     <dependency>
@@ -89,9 +92,28 @@ under the License.
       <scope>provided</scope>
     </dependency>
     <dependency>
+      <groupId>org.apache.maven.shared</groupId>
+      <artifactId>maven-artifact-transfer</artifactId>
+      <version>0.12.0</version>
+    </dependency>
+    <dependency>
+      <!-- org.eclipse.aether.util.artifact.SubArtifact -->
+      <groupId>org.apache.maven.resolver</groupId>
+      <artifactId>maven-resolver-util</artifactId>
+      <version>1.4.1</version>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <!-- org.sonatype.aether.util.artifact.SubArtifact -->
+      <groupId>org.sonatype.aether</groupId>
+      <artifactId>aether-util</artifactId>
+      <version>1.13.1</version>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-utils</artifactId>
-      <version>3.1.0</version>
+      <version>3.3.0</version>
     </dependency>
     <dependency>
       <groupId>org.sonatype.plexus</groupId>
@@ -102,12 +124,42 @@ under the License.
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>4.13.1</version>
+      <version>4.13.2</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.hamcrest</groupId>
+      <artifactId>hamcrest-core</artifactId>
+      <version>2.2</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.shared</groupId>
+      <artifactId>maven-invoker</artifactId>
+      <version>3.1.0</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
 
   <build>
+    <testResources>
+      <testResource>
+        <directory>${basedir}/src/test/resources</directory>
+        <filtering>true</filtering>
+        <includes>
+          <include>**/pom.xml</include>
+          <include>**/settings.xml</include>
+        </includes>
+      </testResource>
+      <testResource>
+        <directory>${basedir}/src/test/resources</directory>
+        <excludes>
+          <exclude>**/pom.xml</exclude>
+          <exclude>**/settings.xml</exclude>
+        </excludes>
+      </testResource>
+    </testResources>
+
     <pluginManagement>
       <plugins>
         <plugin>
@@ -120,99 +172,75 @@ under the License.
             </excludes>
           </configuration>
         </plugin>
-        <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
-        <plugin>
-        	<groupId>org.eclipse.m2e</groupId>
-        	<artifactId>lifecycle-mapping</artifactId>
-        	<version>1.0.0</version>
-        	<configuration>
-        		<lifecycleMappingMetadata>
-        			<pluginExecutions>
-        				<pluginExecution>
-        					<pluginExecutionFilter>
-        						<groupId>
-        							org.apache.maven.plugins
-        						</groupId>
-        						<artifactId>
-        							maven-plugin-plugin
-        						</artifactId>
-        						<versionRange>[3.5.2,)</versionRange>
-        						<goals>
-        							<goal>descriptor</goal>
-        						</goals>
-        					</pluginExecutionFilter>
-        					<action>
-        						<ignore></ignore>
-        					</action>
-        				</pluginExecution>
-        			</pluginExecutions>
-        		</lifecycleMappingMetadata>
-        	</configuration>
-        </plugin>
       </plugins>
     </pluginManagement>
-    
     <plugins>
-	    <plugin>
-	        <groupId>org.sonatype.plugins</groupId>
-	        <artifactId>nexus-staging-maven-plugin</artifactId>
-	        <version>${nexus.plugin}</version>
-	        <extensions>true</extensions>
-	        <configuration>
-	            <serverId>ossrh</serverId>
-	            <nexusUrl>https://oss.sonatype.org/</nexusUrl>
-	            <autoReleaseAfterClose>true</autoReleaseAfterClose>
-	        </configuration>
-	    </plugin>
-	    <plugin>
-	        <groupId>org.apache.maven.plugins</groupId>
-	        <artifactId>maven-gpg-plugin</artifactId>
-	        <version>${gpg.plugin}</version>
-	        <configuration>
-	            <passphrase>${gpg.passphrase}</passphrase>
-	        </configuration>
-	        <executions>
-	            <execution>
-	                <id>sign-artifacts</id>
-	                <phase>verify</phase>
-	                <goals>
-	                    <goal>sign</goal>
-	                </goals>
-	            </execution>
-	        </executions>
-	    </plugin>
-	    <plugin>
-	        <groupId>org.apache.maven.plugins</groupId>
-	        <artifactId>maven-source-plugin</artifactId>
-	        <version>${source.plugin}</version>
-	        <executions>
-	            <execution>
-	                <id>attach-sources</id>
-	                <goals>
-	                    <goal>jar-no-fork</goal>
-	                </goals>
-	            </execution>
-	        </executions>
-	    </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>3.2.2</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+            <configuration>
+              <artifactSet>
+                <includes>
+                  <include>org.apache.maven.resolver:maven-resolver-util</include>
+                  <include>org.sonatype.aether:aether-util</include>
+                </includes>
+              </artifactSet>
+              <filters>
+                <filter>
+                  <artifact>org.apache.maven.resolver:maven-resolver-util</artifact>
+                  <includes>
+                    <include>org/eclipse/aether/util/artifact/SubArtifact.class</include>
+                  </includes>
+                </filter>
+                <filter>
+                  <artifact>org.sonatype.aether:aether-util</artifact>
+                  <includes>
+                    <include>org/sonatype/aether/util/artifact/SubArtifact.class</include>
+                  </includes>
+                </filter>
+              </filters>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
   </build>
-
-  <distributionManagement>
-      <snapshotRepository>
-          <id>ossrh</id>
-          <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-      </snapshotRepository>
-      <repository>
-          <id>ossrh</id>
-          <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-      </repository>
-  </distributionManagement>
 
   <profiles>
     <profile>
       <id>run-its</id>
       <build>
         <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-failsafe-plugin</artifactId>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>integration-test</goal>
+                  <goal>verify</goal>
+                </goals>
+              </execution>
+            </executions>
+            <configuration>
+              <environmentVariables>
+                <JENKINS_MAVEN_AGENT_DISABLED>true</JENKINS_MAVEN_AGENT_DISABLED>
+              </environmentVariables>
+              <systemPropertyVariables>
+                <maven.home>${maven.home}</maven.home>
+                <https.protocols>${https.protocols}</https.protocols>
+                <gpg.homedir>${project.build.testOutputDirectory}/gnupg</gpg.homedir>
+                <localRepositoryPath>${project.build.directory}/local-repo</localRepositoryPath>
+                <settingsFile>/it/settings.xml</settingsFile>
+              </systemPropertyVariables>
+            </configuration>
+          </plugin>
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-invoker-plugin</artifactId>

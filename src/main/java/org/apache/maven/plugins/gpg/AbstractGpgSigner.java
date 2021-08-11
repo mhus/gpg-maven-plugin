@@ -1,4 +1,4 @@
-package org.apache.maven.plugin.gpg;
+package org.apache.maven.plugins.gpg;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -35,6 +35,8 @@ import org.apache.maven.project.MavenProject;
  */
 public abstract class AbstractGpgSigner
 {
+    private static final String GPG_PASSPHRASE = "gpg.passphrase";
+
     public static final String SIGNATURE_EXTENSION = ".asc";
 
     protected boolean useAgent;
@@ -145,7 +147,7 @@ public abstract class AbstractGpgSigner
      *
      * @param file The file to sign
      * @return A reference to the generated signature file
-     * @throws org.apache.maven.plugin.MojoExecutionException
+     * @throws MojoExecutionException if signature generation fails
      */
     public File generateSignatureForArtifact( File file )
         throws MojoExecutionException
@@ -208,7 +210,7 @@ public abstract class AbstractGpgSigner
      *
      * @param file The file to sign
      * @param signature The file in which the generate signature will be put
-     * @throws MojoExecutionException
+     * @throws MojoExecutionException if signature generation fails
      */
     protected abstract void generateSignatureForFile( File file, File signature )
         throws MojoExecutionException;
@@ -229,11 +231,11 @@ public abstract class AbstractGpgSigner
 
         if ( project != null )
         {
-            pass = project.getProperties().getProperty( "gpg.passphrase" );
+            pass = project.getProperties().getProperty( GPG_PASSPHRASE );
             if ( pass == null )
             {
                 MavenProject prj2 = findReactorProject( project );
-                pass = prj2.getProperties().getProperty( "gpg.passphrase" );
+                pass = prj2.getProperties().getProperty( GPG_PASSPHRASE );
             }
         }
         if ( pass == null )
@@ -242,7 +244,7 @@ public abstract class AbstractGpgSigner
         }
         if ( project != null )
         {
-            findReactorProject( project ).getProperties().setProperty( "gpg.passphrase", pass );
+            findReactorProject( project ).getProperties().setProperty( GPG_PASSPHRASE, pass );
         }
         return pass;
     }
